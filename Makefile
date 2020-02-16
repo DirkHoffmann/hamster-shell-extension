@@ -41,10 +41,10 @@ help:
 	@echo "   test-docs			to run automated tests on the documentation."
 
 clean: clean-build clean-docs clean-test-docs
-	rm -f dist/*
+	rm -fr $(DISTDIR)
 
 clean-build:
-	rm -fr build
+	rm -fr $(BUILDDIR)
 
 clean-docs:
 	$(MAKE) -C docs clean SPHINX_BUILDDIR=$(SPHINX_BUILDDIR)
@@ -55,7 +55,7 @@ clean-test-docs:
 $(BUILDDIR):
 	mkdir -p $@
 
-collect:
+collect: $(BUILDDIR)
 	cp -R extension/* $(BUILDDIR)
 	cp -R data/* $(BUILDDIR)
 
@@ -72,10 +72,11 @@ develop:
 	pip install -U pip setuptools wheel
 	pip install -U -r requirements.pip
 
-dist: compile
+$(DISTDIR): compile
 # We need to do this like this as 'zip' always uses the cwd as archive root.
 # And for the extension to work extension.js etc. need to be at the root.
-	mkdir -p $(DISTDIR);
+	mkdir -p $(DISTDIR)
+	cd $(BUILDDIR); zip -rq ../dist/contact@projecthamster.org.zip ./*
 	cd $(BUILDDIR); tar -czf ../dist/contact@projecthamster.org.tgz *
 	@ls -l dist
 
